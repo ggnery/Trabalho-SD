@@ -1,0 +1,9 @@
+syntax = "proto3";
+option go_package = "fibexemplo/pb";
+
+service Calc {
+  rpc fib(N) returns (V);
+}
+
+message N { int32 n = 1; }
+message V { int64 v = 1; }

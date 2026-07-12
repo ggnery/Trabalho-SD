@@ -1,0 +1,72 @@
+Para ajudar, dúvida de uma colega mas que servem para todos:
+Boa noite
+
+A ideia de ter um template, foi apenas uma sugestão !!
+
+Com relação as dúvidas:
+
+1 somente para o grupo
+2 sim pode utilizar outro modelo design
+3 obrigatório os slides, o restante é opcional, se tiver algum código, e quiser disponibilizar em GitHub e os demais fiquem a vontade.
+Na verdade estas outras solicitações serão para os trabalhos que vou passar na próxima semana.
+
+Espero ter ajudado. Caso contrário é só avisar .
+
+Vou colocar essas dívidas com respostas para que todos possam ver.
+
+Prof. Dr. Iwens G. Sene Jr
+Associate Professor, Institute of Informatics
+INF
+Federal University of Goiás
+UFG
+Brazil
+Goiânia
+GO
+Brasil
+Tel.: +55 62 3521 1181
+fax.: +55 62 3521 1182
+CV Lattes: http://lattes.cnpq.br/3693296350551971
+
+On Fri, 10 Jul 2026 at 18:39 GIORDANA DE FARIAS FRANCO BUENO BUCCI <giordanabucci@discente.ufg.br> wrote:
+Boa tarde, prof. Iwens,
+
+Estou com algumas dúvidas sobre o seminário e gostaria de tirá-las com o senhor.
+
+1. Na descrição de cada seminário tem uma atividade:
+"Tema: Paradigmas de Interação. Discussão sobre RPC,
+publish-subscribe e filas de mensagens. Atividade: Simulação
+de um sistema de mensageria."
+-> essa atividade é para todos da turma ou somente para o grupo que está apresentando o tema?
+
+2. Nas instruções sobre o seminário no Google Classroom, há a recomendação de que seja um "design moderno, com identidade tecnológica em tons de azul, branco e cinza", e que "todos os grupos devem utilizar o mesmo modelo para facilitar a comparação entre os seminários e evidenciar como cada tema contribui para a construção do sistema distribuído final". Entretanto, o template enviado tem apenas fundo branco e letra preta, além disso diz que "o Template é apenas uma recomendação, podem explorar de outras formas, sendo importante demonstrar maturidade com o tema e a importância, pois os outros grupos vão utilizar." Isso me deixou confusa.
+-> No fim, posso usar o template do INF para o design dos slides?
+
+3. Entregáveis. No template disponibilizado no classroom tem uma página sobre os entregáveis esperados que não tinham sido mencionados em aula ou na descrição do seminário, sendo eles:
+Slides (PPT/PDF) --> já havia mencionado
+Código no GitHub
+Documento SDD
+Diagrama da arquitetura
+README
+Demonstração funcional
+Relatório técnico
+-> quais são realmente o que precisamos entregar para o seminário?
+
+Recomendações de Design dos Slides
+moderno, com identidade tecnológica em tons de azul, branco e cinza.
+16:9 (widescreen).
+títulos 32–40 pt; conteúdo 20–24 pt.
+diagramas, ícones de arquitetura, fluxos e tabelas em vez de textos longos.
+todos os grupos devem utilizar o mesmo modelo para facilitar a comparação entre os seminários e evidenciar como cada tema contribui para a construção do sistema distribuído final.
+Critérios de Avaliação
+
+
+Critério Peso Domínio do conteúdo 20%
+Clareza da apresentação 15%
+Fundamentação teórica 10%
+Qualidade dos exemplos 10%
+Demonstração prática 25%
+Organização dos slides 5%
+Qualidade técnica do código5%
+Respostas às perguntas 10%
+
+Lembrete o Template é apenas uma recomendação, podem explorar de outras formas, sendo importante demonstrar maturidade com o tema e a importância, pois os outros grupos vão utilizar. x
