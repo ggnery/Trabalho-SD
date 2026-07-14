@@ -12,9 +12,6 @@ public record ClienteRequest(
         String category,
 
         @NotNull(message = "A prioridade é obrigatória (NORMAL, PREFERENCIAL, URGENCIA)")
-        Prioridade priority,
-
-        @NotBlank(message = "O contato é obrigatório")
-        String contact
+        Prioridade priority
 ) {
 }
