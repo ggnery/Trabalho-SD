@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clínica - Sistema de Fila</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; padding: 20px; background-color: #f4f4f9; color: #333; }
+        .container { display: flex; flex-wrap: wrap; gap: 20px; max-width: 1000px; margin: 0 auto; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); flex: 1; min-width: 300px; }
+        .card-paciente { background: #e3f2fd; border: 2px solid #90caf9; display: flex; flex-direction: column;}
+        input, select, button { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px;}
+        button { background-color: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.2s;}
+        button:hover { background-color: #0056b3; }
+        .btn-call { background-color: #28a745; }
+        .btn-call:hover { background-color: #218838; }
+        .btn-cancel { background-color: #dc3545; }
+        .btn-cancel:hover { background-color: #c82333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 8px; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; }
+        .urgencia { color: #dc3545; font-weight: bold; }
+        .preferencial { color: #fd7e14; font-weight: bold; }
+        .info-box { padding: 10px; border-radius: 4px; margin-top: auto; background: #fff; border: 1px dashed #ccc;}
+
+        .radio-list {
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            margin-bottom: 15px;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 7px;
+        }
+        .radio-item {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            gap: 7px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: 0.2s;
+            box-sizing: border-box;
+        }
+        .radio-item:hover { background-color: #f1f8ff; }
+        .radio-item:last-child { border-bottom: none; }
+        .radio-item input[type="radio"] {
+            margin: 0;
+            width: auto;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="card">
+        <h2>Cadastro na Fila de Mensagem</h2>
+        <form id="formCadastro">
+            <input type="text" id="nome" placeholder="Nome Completo" required>
+            <input type="text" id="contato" placeholder="Contato (Email/Tel)" required>
+
+            <select id="categoria">
+                <option value="Consulta">Consulta</option>
+                <option value="Exame">Exame</option>
+            </select>
+
+            <select id="prioridade">
+                <option value="NORMAL">Normal</option>
+                <option value="PREFERENCIAL">Preferencial</option>
+                <option value="URGENCIA">Urgência</option>
+            </select>
+
+            <button type="submit">Adicionar à Fila</button>
+        </form>
+        <p id="msgRegistro" style="color: green; font-size: 14px; font-weight: bold;"></p>
+    </div>
+
+    <div class="card">
+        <h2>Ações de Administrador</h2>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-call" onclick="chamarProximo('Consulta')">Chamar Consulta</button>
+            <button class="btn-call" onclick="chamarProximo('Exame')">Chamar Exame</button>
+        </div>
+
+        <h3 style="margin-top: 20px;">Fila Atual (Aguardando)</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Categoria</th>
+                <th>Nome</th>
+                <th>Prioridade</th>
+            </tr>
+            </thead>
+            <tbody id="tabelaFila">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card card-paciente">
+        <h2>Ações de Usuário</h2>
+
+        <div class="radio-list" id="listaPacientesRadio">
+            <div style="padding: 10px; color: #777; text-align: center;">A fila está vazia.</div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button onclick="consultarMinhaPosicao()">Consultar Posição</button>
+            <button class="btn-cancel" onclick="desistirDaFila()">Desistir</button>
+        </div>
+
+        <div class="info-box" id="msgCliente">
+            <em>Selecione alguém na lista.</em>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const API_URL = 'http://localhost:8080/api';
+
+    async function carregarFila() {
+        try {
+            const response = await fetch(`${API_URL}/admin/queue`);
+            const clientes = await response.json();
+
+            const tbody = document.getElementById('tabelaFila');
+            const radioList = document.getElementById('listaPacientesRadio');
+
+            const radioSelecionado = document.querySelector('input[name="pacienteRadio"]:checked');
+            const idSelecionadoAntes = radioSelecionado ? radioSelecionado.value : null;
+
+            tbody.innerHTML = '';
+            radioList.innerHTML = '';
+
+            if(clientes.length === 0) {
+                radioList.innerHTML = '<div style="padding: 10px; color: #777; text-align: center;">Fila vazia no momento.</div>';
+            }
+
+            clientes.forEach(cliente => {
+                let classePrioridade = '';
+                if(cliente.priority === 'URGENCIA') classePrioridade = 'urgencia';
+                if(cliente.priority === 'PREFERENCIAL') classePrioridade = 'preferencial';
+
+                tbody.innerHTML += `
+                        <tr>
+                            <td>${cliente.category}</td>
+                            <td>${cliente.name}</td>
+                            <td class="${classePrioridade}">${cliente.priority}</td>
+                        </tr>
+                    `;
+
+                const isChecked = (cliente.id === idSelecionadoAntes) ? 'checked' : '';
+
+                radioList.innerHTML += `
+                        <label class="radio-item">
+                            <input type="radio" name="pacienteRadio" value="${cliente.id}" ${isChecked}>
+                            <strong>${cliente.name}</strong> <span style="color:#666; font-size:12px;">(${cliente.category})</span>
+                        </label>
+                    `;
+            });
+
+        } catch (error) {
+            console.error("Erro ao carregar fila.", error);
+        }
+    }
+
+    function obterIdSelecionado() {
+        const radio = document.querySelector('input[name="pacienteRadio"]:checked');
+        return radio ? radio.value : null;
+    }
+
+    document.getElementById('formCadastro').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const payload = {
+            name: document.getElementById('nome').value,
+            contact: document.getElementById('contato').value,
+            category: document.getElementById('categoria').value,
+            priority: document.getElementById('prioridade').value
+        };
+
+        try {
+            const response = await fetch(`${API_URL}/queue`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('msgRegistro').innerText = `Sucesso! Adicionado.`;
+                document.getElementById('formCadastro').reset();
+
+                await carregarFila();
+
+                const novoRadio = document.querySelector(`input[name="pacienteRadio"][value="${data.id}"]`);
+                if(novoRadio) novoRadio.checked = true;
+
+                await consultarMinhaPosicao();
+
+                setTimeout(() => document.getElementById('msgRegistro').innerText = '', 3000);
+            }
+        } catch (error) {
+            alert("Erro ao registrar no backend.");
+        }
+    });
+
+    async function chamarProximo(categoria) {
+        try {
+            const response = await fetch(`${API_URL}/admin/queue/next?category=${categoria}`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                const cliente = await response.json();
+                alert(`Vez do(a): ${cliente.name} para ${cliente.category}`);
+
+                await carregarFila();
+            } else if (response.status === 404) {
+                alert(`Ninguém aguardando para ${categoria}.`);
+            }
+        } catch (error) {
+            alert("Erro ao tentar chamar o próximo.");
+        }
+    }
+
+    async function consultarMinhaPosicao() {
+        const id = obterIdSelecionado();
+        const divMsg = document.getElementById('msgCliente');
+
+        if (!id) {
+            divMsg.innerHTML = `<span style="color: red; font-weight:bold;">Selecione um paciente.</span>`;
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/queue/${id}/position`);
+
+            if (response.ok) {
+                const data = await response.json();
+                divMsg.innerHTML = `
+                        <strong>Sua Posição atual:</strong> <br>
+                        <div style="font-size: 32px; color: #007bff; font-weight: bold; text-align: center; margin: 5px 0;">${data.position}º lugar</div>
+                        <div style="color: #555; text-align: center;">Tempo Estimado: ${data.estimatedTime}</div>
+                    `;
+            } else {
+                divMsg.innerHTML = `<span style="color: red;">Erro ao consultar.</span>`;
+                await carregarFila();
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function desistirDaFila() {
+        const id = obterIdSelecionado();
+        const divMsg = document.getElementById('msgCliente');
+
+        if (!id) {
+            alert('Selecione alguém para desistir.');
+            return;
+        }
+
+        if(!confirm(`Deseja desistir da espera?`)) return;
+
+        try {
+            const response = await fetch(`${API_URL}/queue/${id}`, { method: 'DELETE' });
+
+            if (response.ok || response.status === 204) {
+                divMsg.innerHTML = `<div style="color: #dc3545; font-weight: bold; text-align: center; padding: 10px;">Inscrição cancelada com sucesso.</div>`;
+                await carregarFila();
+            } else {
+                alert("Erro ao cancelar inscrição no backend.");
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    carregarFila();
+</script>
+</body>
+</html>
