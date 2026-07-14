@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    container_name: 'sd_postgres'
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_DB: 'sd_database'
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql
+
+  rabbitmq:
+    image: 'rabbitmq:4-management-alpine'
+    container_name: 'sd_rabbitmq'
+    environment:
+      RABBITMQ_DEFAULT_PASS: 'mqadmin'
+      RABBITMQ_DEFAULT_USER: 'mqadmin'
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - ./data/rabbitmq:/var/lib/rabbitmq
